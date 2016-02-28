@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentManager;
-import android.view.View;
-
 import com.astuetz.PagerSlidingTabStrip;
 
 /**
@@ -30,12 +28,7 @@ public class MyPagerAdapter extends FragmentPagerAdapter implements PagerSliding
     @Override
     public Fragment getItem(int position) {
 
-        /*TimerFragment timerFragment = new TimerFragment();
-        Bundle args = new Bundle();
-        args.putInt("timeActivity",mactivityList[position]);
-        timerFragment.setArguments(args);
 
-        return timerFragment;*/
 
         switch (position) {
             case 0:

@@ -16,5 +16,24 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="switch_margin">20dp</dimen>
     <dimen name="icon_margin">12dp</dimen>
+
+
+    <!--TextSize-->
+    <dimen name="text_size_x1">8sp</dimen>
+    <dimen name="text_size_x1_5">12sp</dimen>
+    <dimen name="text_size_x2">16sp</dimen>
+    <dimen name="text_size_x2_5">20sp</dimen>
+
+    <!--LayoutSize-->
+    <dimen name="layout_size_x1">8dp</dimen>
+    <dimen name="layout_size_x2">16dp</dimen>
+    <dimen name="layout_size_x3">24dp</dimen>
+    <dimen name="layout_size_x4">32dp</dimen>
+    <dimen name="layout_size_x7">56dp</dimen>
+    <dimen name="layout_size_x8">64dp</dimen>
+    <dimen name="layout_size_x9">72dp</dimen>
+
+
 </resources>

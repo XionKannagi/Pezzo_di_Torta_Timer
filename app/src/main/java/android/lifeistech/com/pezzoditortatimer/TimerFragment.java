@@ -13,7 +13,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
+
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Created by togane on 2016/02/25.
@@ -92,9 +95,16 @@ public class TimerFragment extends Fragment {
         View view = inflater.inflate(R.layout.timer_activity_main, container, false);
 
 
+        //List<WorksInfoDB> worksInfoDBs = new Select().from(WorksInfoDB.class).execute();
+
+        WorksInfoDB infoData = WorksInfoDB.load(WorksInfoDB.class,0);
+        String workname = infoData.workname;
+        int setValue = infoData.setValue;
+        int remaindValue = infoData.remindValue;
 
         //仕事表示用のTextView
         work_name = (TextView) view.findViewById(R.id.work_name);
+        work_name.setText(workname);
 
         //時間表示用のTextView
         time_text = (TextView) view.findViewById(R.id.time_text);
@@ -102,10 +112,10 @@ public class TimerFragment extends Fragment {
 
 
         piece_text = (TextView) view.findViewById(R.id.piece_text);
-        piece_text.setText("0");
+        piece_text.setText(setValue);
 
         hole_text = (TextView) view.findViewById(R.id.hole_text);
-        hole_text.setText("0");
+        hole_text.setText(remaindValue);
 
 
         start_btn = (Button) view.findViewById(R.id.start_btn);
@@ -128,10 +138,6 @@ public class TimerFragment extends Fragment {
             }
         });
 
-        SharedPreferences timeDate = getActivity().getSharedPreferences("timeDate", getContext().MODE_PRIVATE);
-        SharedPreferences.Editor editor = timeDate.edit();
-        editor.putLong("TimeDataSave", nTime);
-        editor.apply();
 
 
         return view;

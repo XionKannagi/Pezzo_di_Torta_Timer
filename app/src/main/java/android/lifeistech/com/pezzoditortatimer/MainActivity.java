@@ -9,6 +9,8 @@ import android.view.MenuItem;
 
 import com.astuetz.PagerSlidingTabStrip;
 
+import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,15 +24,10 @@ public class MainActivity extends AppCompatActivity {
         //ViewPagerを紐ずけ
         ViewPager viewPager = (ViewPager)findViewById(R.id.viewPager);
 
+
         //PagerSlidingTabStrip
         PagerSlidingTabStrip tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
 
-
-        int[] iconImageRes = {
-                R.drawable.ic_alarm_add_white_24dp,
-                R.drawable.ic_timer_white_24dp,
-                R.drawable.ic_insert_chart_white_24dp,
-                R.drawable.ic_settings_white_24dp};
 
         int[] activityList = {
                 R.layout.timer_activity_main,
