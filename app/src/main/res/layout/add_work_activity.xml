@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom">
 
-            <ImageButton
+            <Button
                 android:layout_width="@dimen/icon_size_x5"
                 android:layout_height="@dimen/icon_size_x5"
                 android:layout_gravity="center_horizontal"

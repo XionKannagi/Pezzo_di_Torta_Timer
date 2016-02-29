@@ -6,9 +6,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
 
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN;
@@ -23,9 +25,11 @@ public class AddWorksFragment extends Fragment {
     NumberPicker hourPicker;
     NumberPicker minPicker;
 
-    ImageButton imageButton;
+    Button add_btn;
 
     WorksInfoDB worksInfoDB;
+
+    String work_Name;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle SaveInstanceState) {
@@ -35,11 +39,7 @@ public class AddWorksFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.add_work_activity, container, false);
 
-        worksInfoDB = new WorksInfoDB();
-        worksInfoDB.workname = "hpge";
-        worksInfoDB.setValue = 0;
-        worksInfoDB.remindValue = 0;
-        worksInfoDB.save();
+
 
         //仕事の追加Edit_Text
         addWorkName = (EditText) view.findViewById(R.id.edit_work_name);
@@ -56,20 +56,35 @@ public class AddWorksFragment extends Fragment {
         minPicker.setMinValue(0);
 
         //addボタン
-        imageButton = (ImageButton) view.findViewById(R.id.add_button);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //入力を記録
-                String work_Name = addWorkName.getText().toString();
-                //insert
-                worksInfoDB.workname = work_Name;
-                worksInfoDB.setValue = hourPicker.getValue() * 2 + minPicker.getValue() / 30;
-                worksInfoDB.remindValue = minPicker.getValue() % 30;
-                worksInfoDB.save();
+        add_btn = (Button) view.findViewById(R.id.add_button);
+        add_btn.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //入力を記録
+                        work_Name = addWorkName.getText().toString();
 
-            }
-        });
+                        worksInfoDB = new WorksInfoDB();
+
+                        if (work_Name != null && hourPicker.getValue() != 0 || minPicker.getValue() != 0) {
+
+
+                            // /insert
+                            worksInfoDB.workname = work_Name;
+                            worksInfoDB.setValue = hourPicker.getValue() * 2 + minPicker.getValue() / 30;
+                            worksInfoDB.remindValue = minPicker.getValue() % 30;
+                            worksInfoDB.save();
+
+                            //ボタンが押されたらedittext内を初期化
+                            addWorkName.getEditableText().clear();
+
+                            Toast.makeText(getContext(), "Work is Added!", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                }
+
+        );
 
 
         return view;

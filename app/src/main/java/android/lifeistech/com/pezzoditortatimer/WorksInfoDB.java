@@ -9,7 +9,7 @@ import com.activeandroid.annotation.Table;
  * Created by togane on 2016/02/27.
  */
 
-@Table(name = "WorksInfo_taable")
+@Table(name = "WorksInfo_table")
 public class WorksInfoDB extends Model {
 
     @Column(name = "Work_Name")

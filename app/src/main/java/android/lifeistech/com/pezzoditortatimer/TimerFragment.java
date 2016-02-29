@@ -34,17 +34,20 @@ public class TimerFragment extends Fragment {
 
     Button start_btn;
 
+    List<WorksInfoDB> infoDatas;
 
-    //SharedPreferences savedTime = getActivity().getSharedPreferences("timeData", Context.MODE_PRIVATE);
 
+    private static long nTime = 25000;
 
-    //private long nTime = savedTime.getLong("timeDataSave", 30000);
+    private static long workTime = 25000;
 
-    private static long nTime = 30000;
+    private static long restTime = 5000;
 
     private static MyCountDownTimer mCountDownTimer;
 
     int set = 0;
+    int hole = 0;
+    int index = 0;
 
     SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
 
@@ -67,7 +70,7 @@ public class TimerFragment extends Fragment {
 
                 btn_flag = true;
                 state_flag = false;
-                nTime = 35000;
+                nTime = restTime;
                 time_text.setText(String.format("%1$02d:%2$02d", nTime / 1000 / 60, nTime / 1000 % 60));
                 Toast.makeText(getContext(), "Time to rest", Toast.LENGTH_SHORT).show();
                 start_btn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
@@ -79,32 +82,52 @@ public class TimerFragment extends Fragment {
 
                 btn_flag = true;
                 state_flag = true;
-                nTime = 30000;
+                nTime = workTime;
                 time_text.setText(Long.toString(nTime / 1000 / 60) + ":" + Long.toString(nTime / 1000 % 60));
                 Toast.makeText(getContext(), "Time to Work!!", Toast.LENGTH_SHORT).show();
                 start_btn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
-
+                upDate();
             }
         }
+    }
+    //仕事情報の更新
+    public void upDate() {
+        if (infoDatas.size() > index) {
+            //仕事表示用のTextView
+            work_name.setText(infoDatas.get(index).workname);
+
+            //setを一個引く
+            infoDatas.get(index).setValue--;
+            //残りのセットがなければDBから削除
+            if (infoDatas.get(index).setValue == 0) {
+                infoDatas.get(index).delete();
+
+                //終わった仕事をカウント
+                hole++;
+                hole_text.setText(hole);
+            }
+
+            index++;
+
+        } else {
+            index = 0;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        infoDatas = new Select().from(WorksInfoDB.class).execute();
+        upDate();
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle SaveInstanceState) {
-
         View view = inflater.inflate(R.layout.timer_activity_main, container, false);
 
-
-        //List<WorksInfoDB> worksInfoDBs = new Select().from(WorksInfoDB.class).execute();
-
-        WorksInfoDB infoData = WorksInfoDB.load(WorksInfoDB.class,0);
-        String workname = infoData.workname;
-        int setValue = infoData.setValue;
-        int remaindValue = infoData.remindValue;
-
-        //仕事表示用のTextView
         work_name = (TextView) view.findViewById(R.id.work_name);
-        work_name.setText(workname);
+
 
         //時間表示用のTextView
         time_text = (TextView) view.findViewById(R.id.time_text);
@@ -112,10 +135,10 @@ public class TimerFragment extends Fragment {
 
 
         piece_text = (TextView) view.findViewById(R.id.piece_text);
-        piece_text.setText(setValue);
+        piece_text.setText("0");
 
         hole_text = (TextView) view.findViewById(R.id.hole_text);
-        hole_text.setText(remaindValue);
+        //hole_text.setText(remaindValue);
 
 
         start_btn = (Button) view.findViewById(R.id.start_btn);
@@ -138,9 +161,8 @@ public class TimerFragment extends Fragment {
             }
         });
 
-
-
         return view;
     }
+
 
 }
