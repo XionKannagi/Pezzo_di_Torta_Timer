@@ -8,10 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.NumberPicker;
 import android.widget.Toast;
 
+
+import de.greenrobot.event.EventBus;
 
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN;
 
@@ -30,6 +31,24 @@ public class AddWorksFragment extends Fragment {
     WorksInfoDB worksInfoDB;
 
     String work_Name;
+
+
+    @Override
+    public void onCreate(Bundle bundle){
+        super.onCreate(bundle);
+        //EventBusを登録
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onPause(){
+        //登録を解除
+        EventBus.getDefault().unregister(this);
+        super.onPause();
+    }
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle SaveInstanceState) {
@@ -69,16 +88,20 @@ public class AddWorksFragment extends Fragment {
                         if (work_Name != null && hourPicker.getValue() != 0 || minPicker.getValue() != 0) {
 
 
-                            // /insert
+                            // DBに情報をinsert
                             worksInfoDB.workname = work_Name;
                             worksInfoDB.setValue = hourPicker.getValue() * 2 + minPicker.getValue() / 30;
                             worksInfoDB.remindValue = minPicker.getValue() % 30;
                             worksInfoDB.save();
 
-                            //ボタンが押されたらedittext内を初期化
+                            //ボタンが押されたらediTtext内を初期化
                             addWorkName.getEditableText().clear();
 
+                            //追加時に通知
                             Toast.makeText(getContext(), "Work is Added!", Toast.LENGTH_SHORT).show();
+
+                            //決定のタイミングでイベントをポスト
+                            EventBus.getDefault().post(new ClickEvent(true));
                         }
 
                     }
@@ -89,6 +112,20 @@ public class AddWorksFragment extends Fragment {
 
         return view;
     }
+
+
+
+    public class ClickEvent{
+        public final boolean clickFlag;
+
+        public ClickEvent(boolean clickFlag){
+            this.clickFlag = clickFlag;
+        }
+
+    }
+
+
+
 
 
 }

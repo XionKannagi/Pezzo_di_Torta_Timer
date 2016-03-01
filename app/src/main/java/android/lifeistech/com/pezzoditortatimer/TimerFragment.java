@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.lifeistech.com.pezzoditortatimer.R;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import com.activeandroid.query.Select;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by togane on 2016/02/25.
@@ -49,7 +52,21 @@ public class TimerFragment extends Fragment {
     int hole = 0;
     int index = 0;
 
+    //分を綺麗に保湯時するためにものそのうち実装
     SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+
+
+    @Override
+    public void onCreate(Bundle bundle){
+        super.onCreate(bundle);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onPause(){
+        EventBus.getDefault().unregister(this);
+        super.onPause();
+    }
 
 
     class MyCountDownTimer extends CountDownTimer {
@@ -86,7 +103,14 @@ public class TimerFragment extends Fragment {
                 time_text.setText(Long.toString(nTime / 1000 / 60) + ":" + Long.toString(nTime / 1000 % 60));
                 Toast.makeText(getContext(), "Time to Work!!", Toast.LENGTH_SHORT).show();
                 start_btn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
-                upDate();
+
+                if (infoDatas.size()>0) {
+                    upDate();
+                } else {
+                    work_name.setText("Add Work!!");
+                }
+
+
             }
         }
     }
@@ -113,6 +137,14 @@ public class TimerFragment extends Fragment {
             index = 0;
         }
     }
+
+    public void onEvent(AddWorksFragment.ClickEvent clickFlag){
+
+        infoDatas = new Select().from(WorksInfoDB.class).execute();
+
+    }
+
+
 
     @Override
     public void onResume() {
