@@ -1,10 +1,7 @@
 package android.lifeistech.com.pezzoditortatimer;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.lifeistech.com.pezzoditortatimer.R;
+
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -52,7 +49,7 @@ public class TimerFragment extends Fragment {
     int hole = 0;
     int index = 0;
 
-    //分を綺麗に保湯時するためにものそのうち実装
+    //分を綺麗に表示するためにものそのうち実装
     SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
 
 
@@ -60,13 +57,16 @@ public class TimerFragment extends Fragment {
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         EventBus.getDefault().register(this);
+
     }
 
+
     @Override
-    public void onPause(){
+    public void onDestroy(){
         EventBus.getDefault().unregister(this);
-        super.onPause();
+        super.onDestroy();
     }
+
 
 
     class MyCountDownTimer extends CountDownTimer {
@@ -138,9 +138,13 @@ public class TimerFragment extends Fragment {
         }
     }
 
-    public void onEvent(AddWorksFragment.ClickEvent clickFlag){
+    public void onEvent (ClickEvent clickFlag){
 
-        infoDatas = new Select().from(WorksInfoDB.class).execute();
+        if (clickFlag != null) {
+
+            infoDatas = new Select().from(WorksInfoDB.class).execute();
+
+        }
 
     }
 
@@ -195,6 +199,8 @@ public class TimerFragment extends Fragment {
 
         return view;
     }
+
+
 
 
 }

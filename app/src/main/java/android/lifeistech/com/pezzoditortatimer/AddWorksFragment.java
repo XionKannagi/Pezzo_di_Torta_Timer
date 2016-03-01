@@ -33,6 +33,7 @@ public class AddWorksFragment extends Fragment {
     String work_Name;
 
 
+    /*
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
@@ -41,12 +42,12 @@ public class AddWorksFragment extends Fragment {
     }
 
     @Override
-    public void onPause(){
+    public void onDestroy(){
         //登録を解除
         EventBus.getDefault().unregister(this);
-        super.onPause();
+        super.onDestroy();
     }
-
+    */
 
 
 
@@ -114,15 +115,6 @@ public class AddWorksFragment extends Fragment {
     }
 
 
-
-    public class ClickEvent{
-        public final boolean clickFlag;
-
-        public ClickEvent(boolean clickFlag){
-            this.clickFlag = clickFlag;
-        }
-
-    }
 
 
 

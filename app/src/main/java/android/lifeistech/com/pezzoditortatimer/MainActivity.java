@@ -1,6 +1,7 @@
 package android.lifeistech.com.pezzoditortatimer;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         //PagerSlidingTabStrip
         PagerSlidingTabStrip tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        tabStrip.setIndicatorColor(Color.GRAY);
 
 
         int[] activityList = {
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(myPagerAdapter);
 
         tabStrip.setViewPager(viewPager);
+
 
 
 
