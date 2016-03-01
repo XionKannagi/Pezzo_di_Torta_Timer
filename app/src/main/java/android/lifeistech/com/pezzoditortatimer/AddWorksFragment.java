@@ -1,6 +1,10 @@
 package android.lifeistech.com.pezzoditortatimer;
 
 
+
+import android.app.LoaderManager;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,14 +16,14 @@ import android.widget.NumberPicker;
 import android.widget.Toast;
 
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
 
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN;
 
 /**
  * Created by togane on 2016/02/25.
  */
-public class AddWorksFragment extends Fragment {
+public class AddWorksFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     EditText addWorkName;
 
@@ -33,21 +37,7 @@ public class AddWorksFragment extends Fragment {
     String work_Name;
 
 
-    /*
-    @Override
-    public void onCreate(Bundle bundle){
-        super.onCreate(bundle);
-        //EventBusを登録
-        EventBus.getDefault().register(this);
-    }
 
-    @Override
-    public void onDestroy(){
-        //登録を解除
-        EventBus.getDefault().unregister(this);
-        super.onDestroy();
-    }
-    */
 
 
 
@@ -101,7 +91,7 @@ public class AddWorksFragment extends Fragment {
                             //追加時に通知
                             Toast.makeText(getContext(), "Work is Added!", Toast.LENGTH_SHORT).show();
 
-                            //決定のタイミングでイベントをポスト
+                            //決定のタイミングでイベントをポスト（イベントの発火）
                             EventBus.getDefault().post(new ClickEvent(true));
                         }
 
@@ -115,9 +105,18 @@ public class AddWorksFragment extends Fragment {
     }
 
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
 
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+    }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
 
-
+    }
 }

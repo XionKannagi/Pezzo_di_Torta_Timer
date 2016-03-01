@@ -1,6 +1,11 @@
 package android.lifeistech.com.pezzoditortatimer;
 
 
+
+import android.app.LoaderManager;
+import android.content.ClipData;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -13,15 +18,19 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
+
 
 /**
  * Created by togane on 2016/02/25.
  */
-public class TimerFragment extends Fragment {
+public class TimerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     TextView work_name;
     TextView time_text;
@@ -53,6 +62,8 @@ public class TimerFragment extends Fragment {
     SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
 
 
+
+
     @Override
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
@@ -66,6 +77,34 @@ public class TimerFragment extends Fragment {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent (ClickEvent clickFlag){
+
+        if (clickFlag != null) {
+
+            infoDatas = new Select().from(WorksInfoDB.class).execute();
+
+        }
+
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+    }
+
 
 
 
@@ -138,15 +177,6 @@ public class TimerFragment extends Fragment {
         }
     }
 
-    public void onEvent (ClickEvent clickFlag){
-
-        if (clickFlag != null) {
-
-            infoDatas = new Select().from(WorksInfoDB.class).execute();
-
-        }
-
-    }
 
 
 

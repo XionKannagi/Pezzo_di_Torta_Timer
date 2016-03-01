@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(),activityList);
 
         viewPager.setAdapter(myPagerAdapter);
+        viewPager.setOffscreenPageLimit(3);
 
         tabStrip.setViewPager(viewPager);
 
