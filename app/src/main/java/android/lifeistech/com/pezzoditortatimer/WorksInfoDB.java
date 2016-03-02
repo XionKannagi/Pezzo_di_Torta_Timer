@@ -21,4 +21,9 @@ public class WorksInfoDB extends Model {
     @Column(name = "remind_value")
     public int remindValue;
 
+    @Override
+    public String toString() {
+        return "Work Name: " + workname + "     Remind Time " + setValue * 30 / 60 + " : " + (setValue * 30 % 60 + remindValue);
+    }
+
 }

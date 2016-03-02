@@ -1,7 +1,6 @@
 package android.lifeistech.com.pezzoditortatimer;
 
 
-
 import android.app.LoaderManager;
 import android.content.ClipData;
 import android.content.Loader;
@@ -9,6 +8,7 @@ import android.database.Cursor;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +26,10 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 
-
 /**
  * Created by togane on 2016/02/25.
  */
-public class TimerFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TimerFragment extends Fragment {
 
     TextView work_name;
     TextView time_text;
@@ -56,16 +55,14 @@ public class TimerFragment extends Fragment implements LoaderManager.LoaderCallb
 
     int set = 0;
     int hole = 0;
-    int index = 0;
+    int index = 1;
 
     //分を綺麗に表示するためにものそのうち実装
     SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
 
 
-
-
     @Override
-    public void onCreate(Bundle bundle){
+    public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         EventBus.getDefault().register(this);
 
@@ -73,39 +70,35 @@ public class TimerFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
 
+    //追加Buttonが押された時のEvent
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent (ClickEvent clickFlag){
+    public void onEvent(ClickEvent clickFlag) {
 
-        if (clickFlag != null) {
+        Log.d("call EventBus", "onEvent");
 
-            infoDatas = new Select().from(WorksInfoDB.class).execute();
+
+        infoDatas = new Select().from(WorksInfoDB.class).execute();
+        dbSet();
+
+    }
+
+
+    void dbSet() {
+
+        try {
+            Thread.sleep(30);
+        } catch (InterruptedException e){
 
         }
 
+        work_name.setText(infoDatas.get(index).workname);
     }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
-
-
 
 
     class MyCountDownTimer extends CountDownTimer {
@@ -142,20 +135,18 @@ public class TimerFragment extends Fragment implements LoaderManager.LoaderCallb
                 time_text.setText(Long.toString(nTime / 1000 / 60) + ":" + Long.toString(nTime / 1000 % 60));
                 Toast.makeText(getContext(), "Time to Work!!", Toast.LENGTH_SHORT).show();
                 start_btn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
-
-                if (infoDatas.size()>0) {
-                    upDate();
-                } else {
-                    work_name.setText("Add Work!!");
-                }
-
-
+                index++;//インデックス更新
+                upDate();
             }
         }
     }
+
     //仕事情報の更新
     public void upDate() {
         if (infoDatas.size() > index) {
+
+            Log.d("call Update", "index = " + index );
+
             //仕事表示用のTextView
             work_name.setText(infoDatas.get(index).workname);
 
@@ -163,28 +154,32 @@ public class TimerFragment extends Fragment implements LoaderManager.LoaderCallb
             infoDatas.get(index).setValue--;
             //残りのセットがなければDBから削除
             if (infoDatas.get(index).setValue == 0) {
-                infoDatas.get(index).delete();
 
-                //終わった仕事をカウント
+                //終わった仕事を削除
+                infoDatas.get(index).delete();
+                /*
+                //終わった仕事にカウント
                 hole++;
                 hole_text.setText(hole);
+                */
             }
 
-            index++;
 
         } else {
             index = 0;
+            //仕事表示用のTextView
+            work_name.setText(infoDatas.get(index).workname);
         }
     }
-
-
 
 
     @Override
     public void onResume() {
         super.onResume();
         infoDatas = new Select().from(WorksInfoDB.class).execute();
-        upDate();
+        if (index<infoDatas.size()) {
+            upDate();
+        }
     }
 
 
@@ -204,7 +199,7 @@ public class TimerFragment extends Fragment implements LoaderManager.LoaderCallb
         piece_text.setText("0");
 
         hole_text = (TextView) view.findViewById(R.id.hole_text);
-        //hole_text.setText(remaindValue);
+        hole_text.setText("0");
 
 
         start_btn = (Button) view.findViewById(R.id.start_btn);
@@ -229,8 +224,6 @@ public class TimerFragment extends Fragment implements LoaderManager.LoaderCallb
 
         return view;
     }
-
-
 
 
 }
