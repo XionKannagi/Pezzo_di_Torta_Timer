@@ -1,8 +1,10 @@
 package android.lifeistech.com.pezzoditortatimer;
 
 
+import android.app.FragmentManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -16,7 +18,6 @@ import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HI
 public class MainActivity extends AppCompatActivity {
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //ViewPagerを紐ずけ
-        ViewPager viewPager = (ViewPager)findViewById(R.id.viewPager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
 
 
         //PagerSlidingTabStrip
@@ -38,15 +39,12 @@ public class MainActivity extends AppCompatActivity {
                 R.layout.display_result_activity,
                 R.layout.setting_activity};
 
-        MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(),activityList);
+        final MyPagerAdapter myPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), activityList);
 
         viewPager.setAdapter(myPagerAdapter);
         viewPager.setOffscreenPageLimit(3);
 
         tabStrip.setViewPager(viewPager);
-
-
-
 
 
     }

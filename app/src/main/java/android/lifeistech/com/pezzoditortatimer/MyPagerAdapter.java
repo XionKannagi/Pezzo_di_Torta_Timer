@@ -28,8 +28,6 @@ public class MyPagerAdapter extends FragmentPagerAdapter implements PagerSliding
     @Override
     public Fragment getItem(int position) {
 
-
-
         switch (position) {
             case 0:
                 AddWorksFragment addWorksFragment = new AddWorksFragment();
@@ -51,7 +49,6 @@ public class MyPagerAdapter extends FragmentPagerAdapter implements PagerSliding
                 return displayResultFragment;
 
             case 3:
-
                 SettingFragment settingFragment = new SettingFragment();
                 return settingFragment;
 

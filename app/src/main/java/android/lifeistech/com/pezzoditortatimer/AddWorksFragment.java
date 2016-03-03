@@ -2,9 +2,12 @@ package android.lifeistech.com.pezzoditortatimer;
 
 
 import android.app.AlertDialog;
-import android.app.DialogFragment;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,7 @@ import android.widget.NumberPicker
 import android.widget.Toast;
 
 
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.greenrobot.eventbus.EventBus;
@@ -41,6 +45,8 @@ public class AddWorksFragment extends Fragment {
 
     WorksInfoDB worksInfoDB;
 
+    List<WorksInfoDB> worksInfoDBList;
+
     String work_Name;
 
     ListView workList;
@@ -61,17 +67,35 @@ public class AddWorksFragment extends Fragment {
         workList = (ListView) view.findViewById(R.id.works_ListView);
         workList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                WorksInfoDB data = (WorksInfoDB) parent.getItemAtPosition(position);
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                new AlertDialog.Builder(getContext())
+                        .setTitle(worksInfoDBList.get(position).workname+"消去")
+                        .setMessage("消しますか？")
+                        .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                worksInfoDBList = new Select().from(WorksInfoDB.class).execute();
+                                worksInfoDBList.get(position).delete();
 
 
-                //ダイアログを表示する
-                DialogFragment dialogFragment = new DeleteDialogFragment();
-                Bundle args = new Bundle();
-                args.putInt("position", position);
-                dialogFragment.setArguments(args);
-                dialogFragment.show(getFragmentManager(), "Workの削除");
+                                EventBus.getDefault().post(new DeleteEvent(true));
+                                setWorksList();
 
+                                Log.d("elements is Deleted:", position + "element is Deleted");
+
+                                dialog.dismiss();
+
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        })
+                        .show();
 
             }
         });
@@ -141,13 +165,23 @@ public class AddWorksFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
+    public void onResume(){
+        super.onResume();
+        worksInfoDBList = new Select().from(WorksInfoDB.class).execute();
+
+        if(worksInfoDBList != null) {
+            setWorksList();
+        }
+    }
+
+    @Override
+    public void onPause() {
         EventBus.getDefault().unregister(this);
-        super.onDestroy();
+        super.onPause();
     }
 
     @Subscribe
-    public void onEvent(ClickEvent clickEvent){
+    public void onEvent(WorkFinishEvent finishEvent) {
         setWorksList();
     }
 
@@ -156,7 +190,6 @@ public class AddWorksFragment extends Fragment {
     void setWorksList() {
         List<WorksInfoDB> worksInfoList = new Select().from(WorksInfoDB.class).execute();
         ArrayAdapter<WorksInfoDB> adapter = new ArrayAdapter<>(getContext().getApplicationContext(), R.layout.works_list_row, worksInfoList);
-
         workList.setAdapter(adapter);
     }
 
@@ -168,10 +201,10 @@ public class AddWorksFragment extends Fragment {
             if (pf.getName().equals("mSelectionDivider")) {
                 pf.setAccessible(true);
                 try {
-                    pf.set(myPicker, getResources().getColor(R.color.colorAccent));
+                    pf.setNumber(myPicker, getResources().getColor(R.color.colorAccent));
                     Log.v("test", "here");
                     ColorDrawable colorDrawable =new ColorDrawable(getResources().getColor(R.color.colorAccent));
-                    pf.set(myPicker,colorDrawable);
+                    pf.setNumber(myPicker,colorDrawable);
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 } catch (Resources.NotFoundException e) {

@@ -1,10 +1,8 @@
 package android.lifeistech.com.pezzoditortatimer;
 
 
-import android.app.LoaderManager;
-import android.content.ClipData;
-import android.content.Loader;
-import android.database.Cursor;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.CountDownTimer;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -31,31 +29,49 @@ import java.util.List;
  */
 public class TimerFragment extends Fragment {
 
-    TextView work_name;
-    TextView time_text;
-    TextView piece_text;
+    TextView workNameText;
+    TextView timeText;
+    TextView pieceText;
     TextView hole_text;
 
-    boolean btn_flag = true;
+    boolean btnFlag = true;
 
-    boolean state_flag = true;
+    boolean stateFlag = true;
 
-    Button start_btn;
+    Button startBtn;
+
+    WorksInfoDB worksInfoDB;
 
     List<WorksInfoDB> infoDatas;
 
 
-    private static long nTime = 25000;
+    private static long nTime;
 
-    private static long workTime = 25000;
+    private static long workTime;
 
-    private static long restTime = 5000;
+    private static long restTime;
 
     private static MyCountDownTimer mCountDownTimer;
 
-    int set = 0;
+    int setNumber = 0;
     int hole = 0;
-    int index = 1;
+    int index = 0;
+
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser) {
+            Log.d("TimerFragment", "showing!!!!");
+            setTimes();
+        } else {
+            Log.d("TimerFragment", "hiding!!!!");
+        }
+    }
+
+
+    int deleted_Position;
 
     //分を綺麗に表示するためにものそのうち実装
     SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
@@ -82,22 +98,32 @@ public class TimerFragment extends Fragment {
 
         Log.d("call EventBus", "onEvent");
 
-
         infoDatas = new Select().from(WorksInfoDB.class).execute();
         dbSet();
 
+    }
+
+    @Subscribe
+    public void onEvent(DeleteEvent deleteEvent) {
+
+
+        Log.d("Delete", "call onEvent");
+
+        if (infoDatas == null && index == deleted_Position) {
+            workNameText.setText("Work_Name");
+            index = 0;
+        }
     }
 
 
     void dbSet() {
 
         try {
-            Thread.sleep(30);
-        } catch (InterruptedException e){
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
 
         }
-
-        work_name.setText(infoDatas.get(index).workname);
+        workNameText.setText(infoDatas.get(index).workname);
     }
 
 
@@ -108,78 +134,103 @@ public class TimerFragment extends Fragment {
 
         @Override
         public void onTick(long millisUntilFinished) {
-            time_text.setText(Long.toString(millisUntilFinished / 1000 / 60) + ":" + Long.toString(millisUntilFinished / 1000 % 60));
+            timeText.setText(Long.toString(millisUntilFinished / 1000 / 60) + ":" + Long.toString(millisUntilFinished / 1000 % 60));
             nTime = millisUntilFinished; //現在時刻
         }
 
         @Override
         public void onFinish() {
+            String toastText;
 
-            if (state_flag) {
+            // toastText = "Time to " + (stateFlag ? "rest" : "Work!!");
 
-                btn_flag = true;
-                state_flag = false;
+            if (stateFlag = !stateFlag) {
+
+                stateFlag = true;
+                toastText = "Time to rest";
                 nTime = restTime;
-                time_text.setText(String.format("%1$02d:%2$02d", nTime / 1000 / 60, nTime / 1000 % 60));
-                Toast.makeText(getContext(), "Time to rest", Toast.LENGTH_SHORT).show();
-                start_btn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
-                //終了したセット数をカウント
-                set++;
-                piece_text.setText(String.valueOf(set));
 
             } else {
-
-                btn_flag = true;
-                state_flag = true;
+                stateFlag = false;
+                toastText = "Time to Work!!";
                 nTime = workTime;
-                time_text.setText(Long.toString(nTime / 1000 / 60) + ":" + Long.toString(nTime / 1000 % 60));
-                Toast.makeText(getContext(), "Time to Work!!", Toast.LENGTH_SHORT).show();
-                start_btn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
-                index++;//インデックス更新
-                upDate();
+                //終了したセット数をカウント
+                updateWorksInfo();
             }
+
+            btnFlag = true;
+            startBtn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
+            timeText.setText(String.format("%1$02d:%2$02d", nTime / 1000 / 60, nTime / 1000 % 60));
+            Toast.makeText(getContext(), toastText, Toast.LENGTH_SHORT).show();
         }
     }
 
-    //仕事情報の更新
-    public void upDate() {
-        if (infoDatas.size() > index) {
+    // 仕事情報の更新
+    public void updateWorksInfo() {
+        pieceText.setText(String.valueOf(++setNumber));
 
-            Log.d("call Update", "index = " + index );
+        if (index < infoDatas.size()) {
 
-            //仕事表示用のTextView
-            work_name.setText(infoDatas.get(index).workname);
+            Log.d("call Update", "index = " + index);
 
-            //setを一個引く
-            infoDatas.get(index).setValue--;
+            WorksInfoDB item = infoDatas.get(index);
+            item.setValue -= 1;
+            item.save();
+
+            Log.d("setValue", item.workname + "  setValue is " + item.setValue);
+
+
             //残りのセットがなければDBから削除
-            if (infoDatas.get(index).setValue == 0) {
+            if (item.setValue == 0 || item.remindValue == 0) {
 
                 //終わった仕事を削除
-                infoDatas.get(index).delete();
-                /*
+                item.delete();
+                infoDatas.remove(index);
+
+
                 //終わった仕事にカウント
                 hole++;
-                hole_text.setText(hole);
-                */
+                hole_text.setText(String.valueOf(hole));
+
+            } else {
+                index++;
             }
-
-
-        } else {
-            index = 0;
-            //仕事表示用のTextView
-            work_name.setText(infoDatas.get(index).workname);
         }
+
+        if (index >= infoDatas.size()) {
+            // 一番最初にもどる
+            index = 0;
+        }
+
+        if (infoDatas.size() == 0) {
+            // すべてのタスクを完了した時
+
+            Toast.makeText(getContext(), "仕事が全部終わりました！！", Toast.LENGTH_SHORT).show();
+            workNameText.setText("Work_Name");
+            //AddフラグメントのListViewを更新
+            EventBus.getDefault().post(new WorkFinishEvent(true));
+
+            return;
+        }
+
+        //仕事表示用のTextView
+        workNameText.setText(infoDatas.get(index).workname);
+        //AddフラグメントのListViewを更新
+        EventBus.getDefault().post(new WorkFinishEvent(true));
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
+
+
         infoDatas = new Select().from(WorksInfoDB.class).execute();
-        if (index<infoDatas.size()) {
-            upDate();
+        if (infoDatas.size() != 0) {
+            workNameText.setText(infoDatas.get(index).workname);
         }
+
+
     }
 
 
@@ -187,42 +238,53 @@ public class TimerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle SaveInstanceState) {
         View view = inflater.inflate(R.layout.timer_activity_main, container, false);
 
-        work_name = (TextView) view.findViewById(R.id.work_name);
+        workNameText = (TextView) view.findViewById(R.id.work_name);
 
 
         //時間表示用のTextView
-        time_text = (TextView) view.findViewById(R.id.time_text);
-        time_text.setText(String.format("%1$02d:%2$02d", nTime / 1000 / 60, nTime / 1000 % 60));
+        timeText = (TextView) view.findViewById(R.id.time_text);
+        timeText.setText(String.format("%1$02d:%2$02d", nTime / 1000 / 60, nTime / 1000 % 60));
 
 
-        piece_text = (TextView) view.findViewById(R.id.piece_text);
-        piece_text.setText("0");
+        pieceText = (TextView) view.findViewById(R.id.piece_text);
+        pieceText.setText("0");
 
         hole_text = (TextView) view.findViewById(R.id.hole_text);
         hole_text.setText("0");
 
 
-        start_btn = (Button) view.findViewById(R.id.start_btn);
-        start_btn.setOnClickListener(new View.OnClickListener() {
+        startBtn = (Button) view.findViewById(R.id.start_btn);
+        startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (btn_flag) {
-                    btn_flag = false;
+                if (btnFlag) {
+                    btnFlag = false;
                     mCountDownTimer = new MyCountDownTimer(nTime, 1000);
                     mCountDownTimer.start();
-                    start_btn.setBackgroundResource(R.drawable.ic_pause_circle_outline_white_24dp);
+                    startBtn.setBackgroundResource(R.drawable.ic_pause_circle_outline_white_24dp);
 
 
                 } else {
-                    btn_flag = true;
-                    start_btn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
+                    btnFlag = true;
+                    startBtn.setBackgroundResource(R.drawable.ic_play_arrow_white_24dp);
                     mCountDownTimer.cancel();
                 }
             }
         });
 
         return view;
+    }
+
+    public void setTimes() {
+        SharedPreferences data = getActivity().getSharedPreferences("SaveData", Context.MODE_PRIVATE);
+        workTime = (long)data.getInt("workTime", 25) * 1000 * 60;
+        restTime = (long)data.getInt("restTime", 5) * 1000 * 60;
+        Log.d("call setTimes", "worktime is" + workTime);
+        nTime = workTime;
+
+        timeText.setText(String.format("%1$02d:%2$02d", nTime / 1000 / 60, nTime / 1000 % 60));
+
     }
 
 
