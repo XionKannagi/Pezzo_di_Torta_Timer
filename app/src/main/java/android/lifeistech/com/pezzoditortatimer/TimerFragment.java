@@ -58,19 +58,32 @@ public class TimerFragment extends Fragment {
     int setNumber = 0;
     int hole = 0;
     int index = 0;
+    int deletedPosition;
 
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
+
+
+
         if (isVisibleToUser) {
             Log.d("TimerFragment", "showing!!!!");
             setTimes();
             infoDatas = new Select().from(WorksInfoDB.class).execute();
-            if (infoDatas == null) {
+            if (infoDatas.size() == 0) {
                 workNameText.setText("Work_Name");
                 index = 0;
+            }
+
+            SharedPreferences data = getActivity().getSharedPreferences("SaveData",Context.MODE_PRIVATE);
+            deletedPosition = data.getInt("DeletePosition",0);
+
+            Log.d("positions","index = "+index+"deletePosition = "+deletedPosition);
+
+            if (index == deletedPosition && infoDatas.size() != 0){
+
             }
 
         } else {
@@ -78,8 +91,6 @@ public class TimerFragment extends Fragment {
         }
     }
 
-
-    int deleted_Position;
 
     //分を綺麗に表示するためにものそのうち実装
     SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
@@ -117,7 +128,7 @@ public class TimerFragment extends Fragment {
 
         Log.d("Delete", "call onEvent");
 
-        if (infoDatas == null && index == deleted_Position) {
+        if (infoDatas == null && index == deletedPosition) {
             workNameText.setText("Work_Name");
             index = 0;
         }

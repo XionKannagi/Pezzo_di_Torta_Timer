@@ -27,6 +27,9 @@ import com.activeandroid.query.Select;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import lifeistech.com.pezzoditortatimer.R;
@@ -47,11 +50,11 @@ public class AddWorksFragment extends Fragment {
 
     WorksInfoDB worksInfoDB;
 
-    List<WorksInfoDB> worksInfoDBList;
-
     String work_Name;
 
     ListView workList;
+
+    ArrayAdapter<WorksInfoDB> adapter;
 
 
     @Override
@@ -67,19 +70,26 @@ public class AddWorksFragment extends Fragment {
         addWorkName = (EditText) view.findViewById(R.id.edit_work_name);
 
         workList = (ListView) view.findViewById(R.id.works_ListView);
+        adapter = new ArrayAdapter<>(getContext(), R.layout.works_list_row, new ArrayList<WorksInfoDB>());
+        workList.setAdapter(adapter);
         workList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                final WorksInfoDB work = adapter.getItem(position);
 
                 new AlertDialog.Builder(getContext())
-                        .setTitle(worksInfoDBList.get(position).workname+"消去")
+                        .setTitle(work.workname+"消去")
                         .setMessage("消しますか？")
                         .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                worksInfoDBList = new Select().from(WorksInfoDB.class).execute();
-                                worksInfoDBList.get(position).delete();
+                                SharedPreferences data = getActivity().getSharedPreferences("SaveData",Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = data.edit();
+                                editor.putInt("DeletePosition",position);
+                                editor.apply();
+
+                                work.delete();
 
 
                                 EventBus.getDefault().post(new DeleteEvent(true));
@@ -169,11 +179,11 @@ public class AddWorksFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        worksInfoDBList = new Select().from(WorksInfoDB.class).execute();
+//        worksInfoDBList = new Select().from(WorksInfoDB.class).execute();
 
-        if(worksInfoDBList != null) {
+  //      if(worksInfoDBList != null) {
             setWorksList();
-        }
+    //    }
     }
 
     @Override
@@ -191,8 +201,9 @@ public class AddWorksFragment extends Fragment {
     //登録した仕事をListViewで表示
     void setWorksList() {
         List<WorksInfoDB> worksInfoList = new Select().from(WorksInfoDB.class).execute();
-        ArrayAdapter<WorksInfoDB> adapter = new ArrayAdapter<>(getContext().getApplicationContext(), R.layout.works_list_row, worksInfoList);
-        workList.setAdapter(adapter);
+        adapter.clear();
+        adapter.addAll(worksInfoList);
+        adapter.notifyDataSetChanged();
     }
 
     //pickerの色を変更したい
