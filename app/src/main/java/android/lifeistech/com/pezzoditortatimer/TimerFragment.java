@@ -23,6 +23,8 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import lifeistech.com.pezzoditortatimer.R;
+
 
 /**
  * Created by togane on 2016/02/25.
@@ -65,6 +67,12 @@ public class TimerFragment extends Fragment {
         if (isVisibleToUser) {
             Log.d("TimerFragment", "showing!!!!");
             setTimes();
+            infoDatas = new Select().from(WorksInfoDB.class).execute();
+            if (infoDatas == null) {
+                workNameText.setText("Work_Name");
+                index = 0;
+            }
+
         } else {
             Log.d("TimerFragment", "hiding!!!!");
         }
@@ -118,11 +126,6 @@ public class TimerFragment extends Fragment {
 
     void dbSet() {
 
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-
-        }
         workNameText.setText(infoDatas.get(index).workname);
     }
 
@@ -278,12 +281,13 @@ public class TimerFragment extends Fragment {
 
     public void setTimes() {
         SharedPreferences data = getActivity().getSharedPreferences("SaveData", Context.MODE_PRIVATE);
-        workTime = (long)data.getInt("workTime", 25) * 1000 * 60;
-        restTime = (long)data.getInt("restTime", 5) * 1000 * 60;
+        workTime = (long) data.getInt("workTime", 25) * 1000 * 60;
+        restTime = (long) data.getInt("restTime", 5) * 1000 * 60;
         Log.d("call setTimes", "worktime is" + workTime);
         nTime = workTime;
 
         timeText.setText(String.format("%1$02d:%2$02d", nTime / 1000 / 60, nTime / 1000 % 60));
+
 
     }
 

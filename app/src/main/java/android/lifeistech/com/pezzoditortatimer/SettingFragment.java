@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.NumberPicker;
 
+import lifeistech.com.pezzoditortatimer.R;
+
 /**
  * Created by togane on 2016/02/26.
  */
@@ -53,7 +55,7 @@ public class SettingFragment extends Fragment {
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 if (oldVal != newVal) {
                     workTime = work_TimePicker.getValue();
-                    SharedPreferences data = getActivity().getSharedPreferences("SaveDate", Context.MODE_PRIVATE);
+                    SharedPreferences data = getActivity().getSharedPreferences("SaveData", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = data.edit();
                     editor.putInt("workTime", workTime);
                     editor.apply();
@@ -72,7 +74,7 @@ public class SettingFragment extends Fragment {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 restTime = rest_TimePicker.getValue();
-                SharedPreferences data = getActivity().getSharedPreferences("SaveDate", Context.MODE_PRIVATE);
+                SharedPreferences data = getActivity().getSharedPreferences("SaveData", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = data.edit();
                 editor.putInt("restTime",restTime);
                 editor.apply();

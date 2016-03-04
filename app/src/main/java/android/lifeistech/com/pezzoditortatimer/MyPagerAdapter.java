@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentManager;
 import com.astuetz.PagerSlidingTabStrip;
 
+import lifeistech.com.pezzoditortatimer.R;
+
 /**
  * Created by togane on 2016/02/25.
  */

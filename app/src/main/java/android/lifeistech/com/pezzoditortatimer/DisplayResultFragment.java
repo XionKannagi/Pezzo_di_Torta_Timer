@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import lifeistech.com.pezzoditortatimer.R;
+
 /**
  * Created by togane on 2016/02/26.
  */

@@ -29,6 +29,8 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 
+import lifeistech.com.pezzoditortatimer.R;
+
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN;
 
 /**
