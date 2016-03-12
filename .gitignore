@@ -7,3 +7,5 @@
 /build
 
 KeyStorePath.jks
+
+*.iml
